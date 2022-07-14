@@ -1,0 +1,187 @@
+---
+title: "Multiple and spatial regression analysis - Assignment 5"
+author: "Edgar Manrique"
+date: "5/17/2022"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+We are going to explore data from the London Ward Stats, trying to fit a multivariate linear model to predict Average GCSE scores. As an example we are going to use the median age of the ward, continuing the work from the last assignment.
+
+```{r, message=FALSE, warning=FALSE}
+library(sf)
+library(tidyverse)
+library(patchwork)
+library(RColorBrewer)
+
+df <- st_read('~/Desktop/SpatStat/class 5/LondonWardStats/LondonWardStats.shp')
+Regressiondata <- df %>%
+  dplyr::select(BOROUGH, Average.GC, Median.Age, Median.H_1, Crime.rate, Employment, Unauthoris, Median.Hou) |> 
+  filter(complete.cases(Average.GC, Median.Age, Median.H_1, Crime.rate, Employment))
+```
+
+We are adding some additional variables to help improve the fitness of our model. 
+
+```{r}
+Regressiondata |> as.data.frame() |> select(-geometry, -BOROUGH) |> 
+  gather(key = 'parameter', value = 'value') |> 
+ggplot() + 
+  geom_histogram(aes(x = value)) + 
+  facet_wrap(.~parameter, scales = 'free')+
+  theme_minimal()
+```
+
+We can see that some of the variables do not have a normal distribution. We can fix this by transforming the values, for example using a natural logarithm transformation.
+
+```{r}
+Regressiondata |> as.data.frame() |> select(-geometry, -BOROUGH) |> 
+  gather(key = 'parameter', value = 'value') |> 
+  mutate(value = if_else(parameter %in% c('Median.H_1', 'Crime.rate', 'Median.Hou'), 
+                         log(value),
+                         value)) |> 
+ggplot() + 
+  geom_histogram(aes(x = value)) + 
+  facet_wrap(.~parameter, scales = 'free')+
+  theme_minimal()
+```
+
+Now all possible predictors follow a somewhat normal distribution.
+
+We can also explore co-linearity of the variables with correlation
+
+```{r}
+library(GGally)
+Regressiondata |> 
+  as.data.frame() |> 
+  select(-geometry, -BOROUGH) |> 
+  mutate(Median.H_1 = log(Median.H_1),
+         Crime.rate = log(Crime.rate),
+         Median.Hou = log(Median.Hou)) |> 
+  ggpairs()
+```
+
+In this case Median.H_1 and Median.Hou, and Median.H_1 and Employment have a high positive correlation, so it would not be recommended to use those variables together.
+
+We are going to add variables to our previous linear model and see which combination explains better the variability of Average GCSE scores.
+
+```{r}
+#now model
+model1 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age, data=.)
+model2 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + log(Median.H_1), data=.)
+model3 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + log(Crime.rate), data=.)
+model4 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + Employment, data=.)
+model5 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + Unauthoris, data=.)
+model6 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + log(Median.Hou), data=.)
+model7 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age + log(Median.H_1) + Unauthoris, data=.)
+
+#show the summary of those outputs
+summary(model1)
+summary(model2)
+summary(model3)
+summary(model4)
+summary(model5)
+summary(model6)
+summary(model7)
+
+```
+
+Median.Age, Median.H_1 and Unauthoris explain 54% of Average GCSE scores variability. 
+
+```{r}
+Regressiondata <- Regressiondata |> 
+  mutate(residuals = residuals(model7))
+```
+
+```{r}
+(g1 <- ggplot(Regressiondata) + 
+  geom_sf(aes(fill = residuals), color = 'white', size = .2) +
+  scale_fill_distiller(
+  type = "div",
+  palette = 5,
+  direction = 1,
+  aesthetics = "fill"
+) +
+  coord_sf() +
+  theme_minimal() +
+  labs(fill = 'Model residuals')
+)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+library(spatialreg)
+library(spdep)
+
+knn <- st_geometry(Regressiondata) %>%
+  st_centroid() %>%
+  knearneigh(., k=4) %>%
+  knn2nb()
+
+lw <- nb2listw(knn, style="W", zero.policy=TRUE)
+slag_model2_queen <- lagsarlm(Average.GC ~ Median.Age + log(Median.H_1) + Unauthoris,
+                              data = Regressiondata,
+                              lw, method = "eigen")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+moran.mc(Regressiondata$residuals, lw, nsim=9999, alternative="greater")
+```
+
+Moran's Index was calculated to test for spatial autocorrelation of the residuals. Now we are going to introduce a spatial lag term to the equation.
+
+```{r, message=FALSE, warning=FALSE}
+broom::tidy(slag_model2_queen)
+summary(slag_model2_queen)
+
+Regressiondata <- Regressiondata |> 
+  mutate(residuals_spatial = residuals(slag_model2_queen))
+
+moran.mc(Regressiondata$residuals_spatial, lw, nsim=9999, alternative="greater")
+```
+
+By compensating for the spatial variability, Moran's I was reduced significantly. 
+
+```{r}
+g2 <- ggplot(Regressiondata) + 
+  geom_sf(aes(fill = residuals_spatial), color = 'white', size = .2) +
+  scale_fill_distiller(
+  type = "div",
+  palette = 5,
+  direction = 1,
+  aesthetics = "fill"
+) +
+  coord_sf() +
+  theme_minimal() +
+  labs(fill = 'Model residuals - spatial')
+
+g1 / g2
+```
+
+```{r}
+library(ggExtra)
+
+g <- Regressiondata |> 
+  ggplot() + 
+  geom_point(aes(x = residuals, y = residuals_spatial)) +
+  xlim(-50, 50) +
+  ylim(-50, 50) +
+  coord_equal()
+
+g1 <- ggMarginal(g, type="density")
+g1
+```
+
+Model residuals for both, multiple linear regression with and without the spatial term, have a normal distribution. 
+

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-0.9.218">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Edgar Manrique">
+  <title>Assignment 8 - Point pattern analysis</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+
+  <script src="Assign8_Manrique_files/libs/clipboard/clipboard.min.js"></script>
+  <script src="Assign8_Manrique_files/libs/quarto-html/quarto.js"></script>
+  <script src="Assign8_Manrique_files/libs/quarto-html/popper.min.js"></script>
+  <script src="Assign8_Manrique_files/libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="Assign8_Manrique_files/libs/quarto-html/anchor.min.js"></script>
+  <link href="Assign8_Manrique_files/libs/quarto-html/tippy.css" rel="stylesheet">
+  <link class="quarto-color-scheme" id="quarto-text-highlighting-styles" href="Assign8_Manrique_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <link class="quarto-color-scheme quarto-color-alternate" rel="prefetch" id="quarto-text-highlighting-styles" href="Assign8_Manrique_files/libs/quarto-html/quarto-syntax-highlighting-dark.css">
+  <script src="Assign8_Manrique_files/libs/bootstrap/bootstrap.min.js"></script>
+  <link href="Assign8_Manrique_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link class="quarto-color-scheme" href="Assign8_Manrique_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link class="quarto-color-scheme quarto-color-alternate" rel="prefetch" href="Assign8_Manrique_files/libs/bootstrap/bootstrap-dark.min.css">
+  <script src="Assign8_Manrique_files/libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+  <script src="Assign8_Manrique_files/libs/jquery-1.12.4/jquery.min.js"></script>
+  <link href="Assign8_Manrique_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+  <script src="Assign8_Manrique_files/libs/leaflet-1.3.1/leaflet.js"></script>
+  <link href="Assign8_Manrique_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+  <script src="Assign8_Manrique_files/libs/proj4-2.6.2/proj4.min.js"></script>
+  <script src="Assign8_Manrique_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+  <link href="Assign8_Manrique_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+  <script src="Assign8_Manrique_files/libs/leaflet-binding-2.1.1/leaflet.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc">
+<h2 id="toc-title">Table of contents</h2>
+<ul>
+<li><a href="#crimes-in-london" id="toc-crimes-in-london" class="nav-link active" data-scroll-target="#crimes-in-london">Crimes in London</a>
+<ul class="collapse">
+<li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data">Loading the data</a></li>
+<li><a href="#visualizing-crime" id="toc-visualizing-crime" class="nav-link" data-scroll-target="#visualizing-crime">Visualizing crime</a></li>
+</ul></li>
+<li><a href="#bicycle-theft-analysis" id="toc-bicycle-theft-analysis" class="nav-link" data-scroll-target="#bicycle-theft-analysis">Bicycle theft analysis</a>
+<ul class="collapse">
+<li><a href="#point-pattern-analysis" id="toc-point-pattern-analysis" class="nav-link" data-scroll-target="#point-pattern-analysis">Point pattern analysis</a></li>
+<li><a href="#g-k-functions" id="toc-g-k-functions" class="nav-link" data-scroll-target="#g-k-functions">G &amp; K functions</a></li>
+</ul></li>
+<li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+</ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content page-columns page-full" id="quarto-document-content">
+<header id="title-block-header" class="quarto-title-block default">
+
+
+
+<div class="quarto-title"><h1 class="title display-7">Assignment 8 - Point pattern analysis</h1></div><div class="quarto-title-meta"><div><div class="quarto-title-meta-heading">Author</div><div class="quarto-title-meta-contents"><div class="quarto-title-authors"><div><div>
+<p>Edgar Manrique</p>
+</div></div></div></div></div><div><div class="quarto-title-meta-heading">Published</div><div class="quarto-title-meta-contents"><p class="date">June 25, 2022</p></div></div></div></header>
+
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggforce)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatstat)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stars)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leafem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="crimes-in-london" class="level1 page-columns page-full">
+<h1>Crimes in London</h1>
+<section id="loading-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-data">Loading the data</h2>
+<p>We are going to use the dataset from the <a href="https://data.police.uk/data/">London police records</a> about crimes in the city. We are selecting a subset on January 2021 and 2022 to compare the differences.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>london <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">'data/Londondistricts_UTM30.shp'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>jan22 <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">'data/CrimeLondon_Jan2021_UTM30N.shp'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="fu">st_crs</span>(london)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_intersection</span>(london)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>jan22 <span class="ot">&lt;-</span> jan22 <span class="sc">|&gt;</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Longitude =</span> <span class="fu">st_coordinates</span>(jan22)[, <span class="st">'X'</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">Latitude =</span> <span class="fu">st_coordinates</span>(jan22)[, <span class="st">'Y'</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>jan21 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'data/2021-01/2021-01-metropolitan-street.csv'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">complete.cases</span>(Longitude)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">'Longitude'</span>, <span class="st">'Latitude'</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="fu">st_crs</span>(london)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_intersection</span>(london) </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>jan21 <span class="ot">&lt;-</span> jan21 <span class="sc">|&gt;</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Longitude =</span> <span class="fu">st_coordinates</span>(jan21)[, <span class="st">'X'</span>],</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">Latitude =</span> <span class="fu">st_coordinates</span>(jan21)[, <span class="st">'Y'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="visualizing-crime" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="visualizing-crime">Visualizing crime</h2>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(jan21) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">col =</span> Crime.type), <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Crimes in January 2021'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>, <span class="at">col =</span> <span class="st">'Crime type'</span>) <span class="sc">+</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(jan22) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">col =</span> Crime_type), <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Crimes in January 2022'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>, <span class="at">col =</span> <span class="st">'Crime type'</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Centroid January 2021</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>meanlong21 <span class="ot">&lt;-</span> <span class="fu">mean</span>(jan21<span class="sc">$</span>Longitude)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>meanlat21 <span class="ot">&lt;-</span> <span class="fu">mean</span>(jan21<span class="sc">$</span>Latitude)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Centroid January 2022</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>meanlong22 <span class="ot">&lt;-</span> <span class="fu">mean</span>(jan22<span class="sc">$</span>Longitude)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>meanlat22 <span class="ot">&lt;-</span> <span class="fu">mean</span>(jan22<span class="sc">$</span>Latitude)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard deviation January 2021</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sdlong21 <span class="ot">&lt;-</span> <span class="fu">sd</span>(jan21<span class="sc">$</span>Longitude)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>sdlat21 <span class="ot">&lt;-</span> <span class="fu">sd</span>(jan21<span class="sc">$</span>Latitude)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard deviation January 2022</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>sdlong22 <span class="ot">&lt;-</span> <span class="fu">sd</span>(jan22<span class="sc">$</span>Longitude)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>sdlat22 <span class="ot">&lt;-</span> <span class="fu">sd</span>(jan22<span class="sc">$</span>Latitude)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Distance between 2021 and 2022</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>(dist <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((<span class="fu">abs</span>(<span class="fu">mean</span>(jan21<span class="sc">$</span>Longitude)<span class="sc">-</span><span class="fu">mean</span>(jan22<span class="sc">$</span>Longitude)))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">abs</span>(<span class="fu">mean</span>(jan21<span class="sc">$</span>Latitude)<span class="sc">-</span><span class="fu">mean</span>(jan22<span class="sc">$</span>Latitude)))<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 100.7557</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard distance 2021</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>(standard_distance2021 <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(((jan21<span class="sc">$</span>Longitude<span class="sc">-</span>meanlong21)<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>(jan21<span class="sc">$</span>Latitude<span class="sc">-</span>meanlat21)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span>(<span class="fu">nrow</span>(jan21))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 12565.91</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(standard_distance2022 <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(((jan22<span class="sc">$</span>Longitude<span class="sc">-</span>meanlong22)<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>(jan22<span class="sc">$</span>Latitude<span class="sc">-</span>meanlat22)<span class="sc">^</span><span class="dv">2</span>))<span class="sc">/</span>(<span class="fu">nrow</span>(jan22))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 12318.38</code></pre>
+</div>
+</div>
+<p>The distance between the centers is 100.7556941 meters, meaning that the overall spatial distribution of crimes has not change much during the two years. This could be a little misleading, as we will see later, because it gives the impression that the location of crimes has not changed, and that the places were crime was high in 2021 are the same in 2022.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>circleFun <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">center =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">diameter =</span> <span class="dv">1</span>, <span class="at">npoints =</span> <span class="dv">100</span>){</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">=</span> diameter <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    tt <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">2</span><span class="sc">*</span>pi,<span class="at">length.out =</span> npoints)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    xx <span class="ot">&lt;-</span> center[<span class="dv">1</span>] <span class="sc">+</span> r <span class="sc">*</span> <span class="fu">cos</span>(tt)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    yy <span class="ot">&lt;-</span> center[<span class="dv">2</span>] <span class="sc">+</span> r <span class="sc">*</span> <span class="fu">sin</span>(tt)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> xx, <span class="at">y =</span> yy))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>circle21 <span class="ot">&lt;-</span> <span class="fu">circleFun</span>(<span class="fu">c</span>(meanlong21,meanlat21),standard_distance2021<span class="sc">*</span><span class="dv">2</span>,<span class="at">npoints =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We can better visualize the spread of crime around the center by using the standard distance and the standard deviation, note that in the first case the spread only considers the standard distance as a radius, so the spread is constant in every direction, in the second case we are using the standard deviation in both directions (N-S, W-E) to build an ellipse:</p>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(jan21) <span class="sc">+</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_sf(aes(col = Crime.type)) + </span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_path</span>(<span class="at">data =</span> circle21, <span class="fu">aes</span>(x,y)) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Crimes in January 2021'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>, <span class="at">caption =</span> <span class="st">'with center and standard distance'</span>) <span class="sc">+</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(jan21) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_sf(aes(col = Crime.type)) + </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ellipse</span>(<span class="fu">aes</span>(<span class="at">x0 =</span> meanlong21, <span class="at">y0 =</span> meanlat21, <span class="at">a =</span> sdlong21, <span class="at">b =</span> sdlat21, <span class="at">angle =</span> <span class="dv">0</span>), <span class="at">n =</span> <span class="dv">360</span>) <span class="sc">+</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Crimes in January 2021'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>, <span class="at">caption =</span> <span class="st">'with center and standard deviation'</span>) <span class="sc">+</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>Now we are going to rank the Boroughs based on their crime count:</p>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>jan21 <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_reorder</span>(name, n, <span class="at">.desc =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> name, <span class="at">x =</span> n), <span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">''</span>, <span class="at">title =</span> <span class="st">'Crimes in january 2021'</span>) <span class="sc">+</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>jan22 <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_reorder</span>(name, n, <span class="at">.desc =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> name, <span class="at">x =</span> n), <span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">''</span>, <span class="at">title =</span> <span class="st">'Crimes in january 2022'</span>) <span class="sc">+</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bicycle-theft-analysis" class="level1 page-columns page-full">
+<h1>Bicycle theft analysis</h1>
+<p>We are going to focus on a specific type of crime, Bicycle theft:</p>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>jan21 <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Crime.type <span class="sc">==</span> <span class="st">'Bicycle theft'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">size =</span> .<span class="dv">001</span>) <span class="sc">+</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Bicycle theft in January 2021'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>) <span class="sc">+</span> </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>jan22 <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Crime_type <span class="sc">==</span> <span class="st">'Bicycle theft'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">size =</span> .<span class="dv">001</span>) <span class="sc">+</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">mean</span>(Longitude), </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">mean</span>(Latitude)), <span class="at">col =</span> <span class="st">'red'</span>, <span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">'Bicycle theft in January 2022'</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">y =</span> <span class="st">''</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>At a first glance there is not much variation in the spatial distribution and clustering between the two years, as we can see in the graph above, even the mean center seem to be really close for the two years. I we look at the rank of Boroughs in the graph below we can now see changes in the position of the Boroughs between the two years. The categories (low, middle, and high) were constructed using thresholds of 0-25, 25-75 and &gt;75 for low, middle and high bicycle theft respectively. We can see that during 2022 there are four Boroughs that are in the high category, compared to three in 2021. The top Borough in 2021, Tower Hamlets, lowered the number of bicycle thefts in 2022 and now appears in the middle category.</p>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>jan21 <span class="sc">|&gt;</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Crime.type <span class="sc">==</span> <span class="st">'Bicycle theft'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_reorder</span>(name, n, <span class="at">.desc =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Category =</span> <span class="fu">cut</span>(n, </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">breaks=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>, <span class="dv">75</span>, <span class="cn">Inf</span>),</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"low"</span>,<span class="st">"middle"</span>,<span class="st">"high"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> name, <span class="at">x =</span> n, <span class="at">fill =</span> Category), <span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">''</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">title =</span> <span class="st">'Bicycle theft in january 2021'</span>) <span class="sc">+</span> </span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>jan22 <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Crime_type <span class="sc">==</span> <span class="st">'Bicycle theft'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">name =</span> <span class="fu">fct_reorder</span>(name, n, <span class="at">.desc =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Category =</span> <span class="fu">cut</span>(n, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">breaks=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>, <span class="dv">75</span>, <span class="cn">Inf</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"low"</span>,<span class="st">"middle"</span>,<span class="st">"high"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> name, <span class="at">x =</span> n, <span class="at">fill =</span> Category), <span class="at">stat =</span> <span class="st">'identity'</span>) <span class="sc">+</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">''</span>, <span class="at">x =</span> <span class="st">''</span>, <span class="at">title =</span> <span class="st">'Bicycle theft in january 2022'</span>) <span class="sc">+</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<section id="point-pattern-analysis" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="point-pattern-analysis">Point pattern analysis</h2>
+<p>We are going to perform Point Pattern Analysis using the package <code>spatstat</code><span class="citation" data-cites="baddeley_spatstat_2021">(<a href="#ref-baddeley_spatstat_2021" role="doc-biblioref">Baddeley, Turner, and Rubak 2021</a>)</span> and using as a reference the tutorial made by Veronesi <span class="citation" data-cites="veronesi_introductory_2015">(<a href="#ref-veronesi_introductory_2015" role="doc-biblioref">Veronesi 2015</a>)</span> and the book developed by Pebesma and Bivand <span class="citation" data-cites="pebesma_spatial_2022">(<a href="#ref-pebesma_spatial_2022" role="doc-biblioref">Pebesma and Bivand 2022</a>)</span>. Point patterns have an observation window and we can define them with the function <code>as.owin</code> having as input the London boundaries. Point patterns in <code>spatstat</code> are objects of the class <code>ppp</code>, if we do not define an observation window, it will use the bounding box of the dataset.</p>
+<p>To test for homogeneity, one could carry out a quadrat count, using an appropriate quadrat layout, in this case we are using a 4x4 grid that is also clipped to the shape of the observation window.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>window <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(london)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>jan21 <span class="ot">&lt;-</span> jan21 <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">duplicated</span>(jan21), </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>         Crime.type <span class="sc">==</span> <span class="st">'Bicycle theft'</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>pp1 <span class="ot">&lt;-</span> <span class="fu">ppp</span>(<span class="at">x =</span> <span class="fu">st_coordinates</span>(jan21)[, <span class="dv">1</span>], </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="fu">st_coordinates</span>(jan21)[, <span class="dv">2</span>], </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">window =</span> window)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">=</span> <span class="fu">quadratcount</span>(pp1, <span class="at">nx=</span><span class="dv">4</span>, <span class="at">ny=</span><span class="dv">4</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(q1, <span class="at">main =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadrat.test</span>(pp1, <span class="at">nx=</span><span class="dv">4</span>, <span class="at">ny=</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>
+    Chi-squared test of CSR using quadrat counts
+
+data:  pp1
+X2 = 1205.3, df = 15, p-value &lt; 2.2e-16
+alternative hypothesis: two.sided
+
+Quadrats: 16 tiles (irregular windows)</code></pre>
+</div>
+</div>
+<p>By using the function <code>quadrat.test</code> we can test for homogeneity, we have a p-value &lt; 0.01 which means that we can reject the null hypothesis and assume that our quadrants are irregular windows.</p>
+<p>Kernel densities estimates can be computed using <code>density</code>, briefly, the function computes a fixed-bandwidth kernel estimate <span class="citation" data-cites="diggle_kernel_1985">(<a href="#ref-diggle_kernel_1985" role="doc-biblioref">Diggle 1985</a>)</span> of the intensity function of the point process that generated the point pattern x. Kernel shape and bandwidth can be controlled, the amount of smoothing is determined by the arguments <code>sigma</code>, <code>varcov</code> and <code>adjust</code>. Here, we test 4 different functions to specify the bandwidth parameter sigma using cross validation, <code>bw.diggle</code>, <code>bw.ppl</code>, and <code>bw.scott</code> with two variations <span class="citation" data-cites="baddeley_spatstat_2021">(<a href="#ref-baddeley_spatstat_2021" role="doc-biblioref">Baddeley, Turner, and Rubak 2021</a>)</span>.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>den1 <span class="ot">&lt;-</span> <span class="fu">density.ppp</span>(pp1, <span class="at">sigma =</span> <span class="fu">bw.diggle</span>(pp1),<span class="at">edge=</span>T)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>den2 <span class="ot">&lt;-</span> <span class="fu">density.ppp</span>(pp1, <span class="at">sigma =</span> <span class="fu">bw.ppl</span>(pp1),<span class="at">edge=</span>T)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>den3 <span class="ot">&lt;-</span> <span class="fu">density.ppp</span>(pp1, <span class="at">sigma =</span> <span class="fu">bw.scott</span>(pp1)[<span class="dv">2</span>],<span class="at">edge=</span>T)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>den4 <span class="ot">&lt;-</span> <span class="fu">density.ppp</span>(pp1, <span class="at">sigma =</span> <span class="fu">bw.scott</span>(pp1)[<span class="dv">1</span>],<span class="at">edge=</span>T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="fu">st_as_stars</span>(den1)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="fu">st_as_stars</span>(den2)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(s2) <span class="ot">&lt;-</span> <span class="fu">st_crs</span>(london)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>s3 <span class="ot">&lt;-</span> <span class="fu">st_as_stars</span>(den3)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>s4 <span class="ot">&lt;-</span> <span class="fu">st_as_stars</span>(den4)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_stars</span>(<span class="at">data =</span> s1) <span class="sc">+</span> </span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">'white'</span>, <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span><span class="st">''</span>, <span class="at">y=</span><span class="st">''</span>, <span class="at">caption =</span> <span class="st">'sigma = bw.diggle, h = 207.29'</span>) <span class="sc">+</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">'plasma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_stars</span>(<span class="at">data =</span> s2) <span class="sc">+</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">'white'</span>, <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span><span class="st">''</span>, <span class="at">y=</span><span class="st">''</span>, <span class="at">caption =</span> <span class="st">'sigma = bw.ppl, h = 973.66'</span>) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">'plasma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_stars</span>(<span class="at">data =</span> s3) <span class="sc">+</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">'white'</span>, <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span><span class="st">''</span>, <span class="at">y=</span><span class="st">''</span>, <span class="at">caption =</span> <span class="st">'sigma = bw.scott[1], h = 1914.78'</span>) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">'plasma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_stars</span>(<span class="at">data =</span> s4) <span class="sc">+</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> london, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">'white'</span>, <span class="at">size =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span><span class="st">''</span>, <span class="at">y=</span><span class="st">''</span>, <span class="at">caption =</span> <span class="st">'sigma = bw.scott[2], h = 2349.69'</span>) <span class="sc">+</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">option =</span> <span class="st">'plasma'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-24-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-24-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<div class="cell page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">leaflet</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addTiles</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addStarsImage</span>(<span class="at">x =</span> s2, </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">opacity =</span> .<span class="dv">5</span>,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">colors =</span> <span class="st">'plasma'</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">project =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display column-screen">
+<div id="htmlwidget-e29bb2cc90b729097564" style="width:100%;height:464px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e29bb2cc90b729097564">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addRasterImage","args":["data:image/png;base64,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",[[51.6968496331168,-0.509546496683291],[51.2734949519146,0.347416255559998]],0.5,null,"stars","stars"]}],"limits":{"lat":[51.2734949519146,51.6968496331168],"lng":[-0.509546496683291,0.347416255559998]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="g-k-functions" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="g-k-functions">G &amp; K functions</h2>
+<p>The nearest neighbour distance distribution function (also called the “event-to-event” or “inter-event” distribution) of a point process X is the cumulative distribution <a href="http://127.0.0.1:20567/library/spatstat.core/html/Gest.html">function G</a> of the distance from a typical random point of X to the nearest other point of X. This algorithm estimates the nearest neighbour distance distribution function G from the point pattern X. It assumes that X can be treated as a realisation of a stationary (spatially homogeneous) random spatial point process in the plane, observed through a bounded window. The window (which is specified in X as Window(X)) may have arbitrary shape <span class="citation" data-cites="baddeley_spatstat_2021">(<a href="#ref-baddeley_spatstat_2021" role="doc-biblioref">Baddeley, Turner, and Rubak 2021</a>)</span>.</p>
+<p>The <a href="http://127.0.0.1:20567/library/spatstat.core/html/Kest.html">K function</a> (variously called “Ripley’s K-function” and the “reduced second moment function”) of a stationary point process X is defined so that lambda K(r) equals the expected number of additional random points within a distance r of a typical random point of X <span class="citation" data-cites="ripley_modelling_1977">(<a href="#ref-ripley_modelling_1977" role="doc-biblioref">Ripley 1977</a>)</span>. Here lambda is the intensity of the process, i.e.&nbsp;the expected number of points of X per unit area. The K function is determined by the second order moment properties of X. This routine Kest estimates the K function of a stationary point process, given observation of the process inside a known, bounded window <span class="citation" data-cites="baddeley_spatstat_2021">(<a href="#ref-baddeley_spatstat_2021" role="doc-biblioref">Baddeley, Turner, and Rubak 2021</a>)</span>.</p>
+<div class="page-columns page-full">
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">Gest</span>(pp1),<span class="at">main=</span><span class="st">"G-function"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>Code</summary>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">Kest</span>(pp1),<span class="at">main=</span><span class="st">"K-function"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell column-screen quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img src="Assign8_Manrique_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>We can see a similar pattern both in the G and K functions, the observed pattern in the G-function is above the poisson distribution, meaning that the observations follow a clustered distribution, this pattern increases along r until it reaches a plateau around r = 600. In the K-function we see the same trend, at very low values of r it is not possible to tell which type of distribution it has, but as r increases it is notable that is has a clustered distribution, as r continues to increase the observations separate from the clustered distribution.</p>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+
+
+</section>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-baddeley_spatstat_2021" class="csl-entry" role="doc-biblioentry">
+Baddeley, Adrian, Rolf Turner, and Ege Rubak. 2021. <span>“Spatstat: <span>Spatial</span> <span>Point</span> <span>Pattern</span> <span>Analysis</span>, <span>Model</span>- <span>Fitting</span>, <span>Simulation</span>, <span>Tests</span>.”</span> <a href="http://spatstat.org/">http://spatstat.org/</a>.
+</div>
+<div id="ref-diggle_kernel_1985" class="csl-entry" role="doc-biblioentry">
+Diggle, Peter. 1985. <span>“A <span>Kernel</span> <span>Method</span> for <span>Smoothing</span> <span>Point</span> <span>Process</span> <span>Data</span>.”</span> <em>Journal of the Royal Statistical Society. Series C (Applied Statistics)</em> 34 (2): 138–47. <a href="https://doi.org/10.2307/2347366">https://doi.org/10.2307/2347366</a>.
+</div>
+<div id="ref-pebesma_spatial_2022" class="csl-entry" role="doc-biblioentry">
+Pebesma, Edzer, and Roger Bivand. 2022. <em>Spatial <span>Data</span> <span>Science</span> with Applications in <span>R</span></em>. <a href="https://keen-swartz-3146c4.netlify.app/pointpatterns.html#coordinate-reference-systems-1">https://keen-swartz-3146c4.netlify.app/pointpatterns.html#coordinate-reference-systems-1</a>.
+</div>
+<div id="ref-ripley_modelling_1977" class="csl-entry" role="doc-biblioentry">
+Ripley, B. D. 1977. <span>“Modelling <span>Spatial</span> <span>Patterns</span>.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 39 (2): 172–92. <a href="https://doi.org/10.1111/j.2517-6161.1977.tb01615.x">https://doi.org/10.1111/j.2517-6161.1977.tb01615.x</a>.
+</div>
+<div id="ref-veronesi_introductory_2015" class="csl-entry" role="doc-biblioentry">
+Veronesi, Fabio. 2015. <span>“Introductory <span>Point</span> <span>Pattern</span> <span>Analysis</span> of <span>Open</span> <span>Crime</span> <span>Data</span> in <span>London</span> <span></span> <span>R</span>-Bloggers.”</span> <a href="https://www.r-bloggers.com/2015/05/introductory-point-pattern-analysis-of-open-crime-data-in-london/">https://www.r-bloggers.com/2015/05/introductory-point-pattern-analysis-of-open-crime-data-in-london/</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+    } else {
+      disableStylesheet(alternateStylesheets);
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+</body></html>

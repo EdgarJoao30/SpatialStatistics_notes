@@ -1,0 +1,62 @@
+---
+title: "class 3"
+author: "Edgar Manrique"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(sf)
+library(nycflights13)
+library(rnaturalearth)
+library(knitr)
+```
+
+```{r}
+airports <- nycflights13::airports
+world <- rnaturalearth::ne_countries(scale = 'medium', 
+                                     type = 'map_units', 
+                                     returnclass = 'sf')
+
+```
+
+# Map
+
+```{r}
+ggplot(data = world) +
+geom_sf() +
+geom_point(data = airports, aes(x = lon, y = lat), size = 1, shape = 23, fill = "darkred") 
+```
+
+# Histogram
+
+```{r}
+flights <- nycflights13::flights
+
+flights |> 
+  dplyr::select(origin, dest, month) |> 
+  dplyr::filter(month == 11) |> 
+  dplyr::count(dest) |> 
+  # dplyr::arrange(-n) |> 
+  # dplyr::slice_head(n = 10) |> 
+  # knitr::kable() |> 
+  ggplot2::ggplot(aes(x = n)) +
+  ggplot2::geom_histogram(binwidth=25) +
+  ggplot2::theme_bw()
+```
+
+```{r}
+flights %>%
+  dplyr::select(origin, dest, month) |> 
+  dplyr::filter(month == 11) |> 
+  dplyr::count(dest) |> 
+  
+  ggplot2::ggplot(aes(x = n)) +
+  ggplot2::geom_boxplot() +
+  ggplot2::theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+```
+

@@ -1,0 +1,97 @@
+---
+title: "Regression analysis - Assignment 4"
+author: "Edgar Manrique"
+date: "5/10/2022"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+We are going to explore data from the London Ward Stats, trying to fit a linear model to predict Average GCSE scores. As an example we are going to use the median age of the ward.
+
+```{r, message=FALSE, warning=FALSE}
+library(sf)
+library(tidyverse)
+library(patchwork)
+library(RColorBrewer)
+
+df <- st_read('~/Desktop/SpatStat/class 5/LondonWardStats/LondonWardStats.shp')
+Regressiondata <- df %>%
+  dplyr::select(Average.GC, Median.Age) |> 
+  filter(complete.cases(Average.GC, Median.Age))
+```
+
+The first thing would be to visually interpret the spatial distribution of the two variables. The dependent variable is on the top (GCSE) and the independent variable (Median age) on the bottom.
+
+```{r}
+g1 <- ggplot(df) +
+  geom_sf(aes(fill = Average.GC), color = 'white', size = .2) +
+  scale_fill_viridis_c(direction = -1)+
+  coord_sf() +
+  theme_minimal() +
+  labs(fill = 'Average GC')
+
+g2 <- ggplot(df) +
+  geom_sf(aes(fill = Median.Age), color = 'white', size = .2) +
+  scale_fill_viridis_c(direction = -1)+
+  coord_sf() +
+  theme_minimal() +
+  labs(fill = 'Median age')
+
+g <- g1 / g2
+g
+```
+
+We can see that there could be a correlation between the two variables as places with higher values in median age also present higher values in GCSE.
+
+We can further explore the linear relation by using a scatterplot:
+
+```{r}
+ggplot2::ggplot(Regressiondata,
+                aes(
+                  x = Median.Age,
+                  y = Average.GC
+                )
+) +
+  ggplot2::xlab("Median age") +
+  ggplot2::ylab("Average GCSE capped point scores 2014") +
+  ggplot2::geom_point(color="blue") +
+  ggplot2::geom_smooth(method=lm , color="red", fill="#69b3a2",
+                       se=FALSE) +
+  ggplot2::theme_minimal() 
+```
+
+Now we can fit a linear model and see how well the GCSE is explained by the median age:
+
+
+```{r}
+#now model
+model1 <- Regressiondata %>%
+  lm(Average.GC ~ Median.Age, data=.)
+#show the summary of those outputs
+summary(model1)
+
+Regressiondata$residuals <- model1$residuals
+```
+
+The model coefficients are estimated with significance levels < 0.001. Although, the r-squared is only 0.24 meaning that 24% of the variability of GCSE is explained by the mean age. For each one percent increase in GCSE score, there is a 2.67 increase in the mean age of the ward. The model can be improved by adding additional explanatory variables.
+
+
+```{r}
+ggplot(Regressiondata) +
+  geom_sf(aes(fill = residuals), color = 'white', size = .2) +
+  scale_fill_distiller(
+  type = "div",
+  palette = 5,
+  direction = 1,
+  aesthetics = "fill"
+) +
+  coord_sf() +
+  theme_minimal() +
+  labs(fill = 'Model residuals')
+```
+
+Another thing that we can explore is the spatial distribution of the model residuals. Ideally, the model residuals should not be spatially auto correlated. Here we can see that this is not the case, we can add a spatial term in the regression model to account for the spatial auto correlation.

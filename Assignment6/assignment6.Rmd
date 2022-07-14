@@ -1,0 +1,67 @@
+---
+title: "Assignment 6 - Spatial autocorrelation"
+author: "Edgar Manrique"
+date: "5/31/2022"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+# Spatial autocorrelation
+
+```{r}
+m <- c(0, 1, 1, 0, 0, 0,
+       1, 0, 1, 1, 1, 0,
+       1, 1, 0, 0, 1, 1, 
+       0, 1, 0, 0, 1, 0, 
+       0, 1, 1, 1, 0, 1, 
+       0, 0, 1, 0, 1, 0) 
+dim(m) <- c(6, 6)
+
+v <- c(32, 26, 19, 18, 17, 14,
+       32, 26, 19, 18, 17, 14,
+       32, 26, 19, 18, 17, 14,
+       32, 26, 19, 18, 17, 14,
+       32, 26, 19, 18, 17, 14,
+       32, 26, 19, 18, 17, 14)
+dim(v) <- c(6, 6)
+
+v_t <- t(v)
+
+mean <- mean(v)
+
+u <- m*(v-mean)*(v_t-mean)
+
+numerator <- sum(u)
+sum_weights <- sum(m)
+n <- 6
+sum_squares <- sum((v_t[ 1, ] - mean)^2)
+
+denominator <- sum_squares/(n-1)*sum_weights
+
+moranI <- numerator/denominator
+```
+
+```{r}
+m_list <- spdep::mat2listw(m, style = 'B')
+
+spdep::moran.mc(v_t[ 1, ], m_list, nsim=500)
+```
+
+## What is the observed rank of the observed Moran's I?
+
+-   The observed rank is 499.
+
+## What is p and how is it calculated?
+
+-   The p value is 0.003992, it is calculated from the number of simulations.
+
+## Formulate H0 and H1. Is your result significant? On what significance level? What does that mean in terms of H0 and H1?
+
+-   Null hypothesis = No difference between the observed and the expected autocorrelation.
+
+-   Alternative hypothesis = The observed autocorrelation is greater then the expected autocorrelation.
+
+-   The p-value is significant \< 0.05. The null hypothesis is rejected.

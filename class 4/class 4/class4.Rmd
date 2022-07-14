@@ -1,0 +1,39 @@
+---
+title: "Class 4"
+author: "Edgar Manrique"
+date: "4/5/2022"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+toss1 <- c('h', 't', 't', 't', 'h', 'h', 'h', 't', 't', 'h')
+toss2 <- c('t', 't', 't', 't', 't', 't', 'h', 'h', 't', 'h')
+toss3 <- c('t', 't', 'h', 'h', 'h', 't', 't', 't', 't', 't')
+
+exp <- data.frame( toss1 = toss1,
+                   toss2 = toss2,
+                   toss3 = toss3) |> 
+  gather(key = 'exp', value = 'value') |> 
+  group_by(exp, value) |> 
+  summarise(count = n())
+```
+
+```{r}
+x <- c(1, 0, 2, 1, 1, 
+       1, 2, 1, 0, 1, 
+       0, 1, 2, 2, 1, 
+       1, 1, 2, 0, 1, 
+       1, 2, 1, 2, 0, 
+       0, 1, 1, 1, 0)
+m <- length(x)
+meanx <- mean(x)
+
+variance <- sum((x - meanx)^2) / (m-1)
+
+xsqr <- (m-1) * variance / meanx
+chisq.test(x)
+```
+
+

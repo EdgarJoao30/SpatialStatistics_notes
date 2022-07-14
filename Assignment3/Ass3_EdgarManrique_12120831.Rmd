@@ -1,0 +1,207 @@
+---
+title: "Spatial statistics - Assignment 3"
+author: "Edgar Manrique"
+date: "4/26/2022"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r include=FALSE}
+library(tidyverse)
+```
+
+1.  Suppose that the mean annual temperature for a location was uniformly distributed, between 10°C and 18°C, implying that in each year any temperature in this range is equally likely to be the mean for the year. (Note: This is an unrealistic example, in the sense that mean temperatures are not likely to have this kind of distribution.)
+
+(a) What is the probability that the mean annual temperature is between 12°C and 15°C (see slide Uniform Distribution)?
+
+```{r}
+set.seed(2)
+x <- data.frame(x = runif(n = 99999, min = 10, max = 18)) 
+x |> 
+ggplot() + 
+  geom_histogram(aes(x = x), fill = 'gray', col = 'black', binwidth = .2, center = .1) +
+  geom_vline(xintercept = 12, color = 'red', linetype = 'dashed') + 
+  geom_vline(xintercept = 15, color = 'red', linetype = 'dashed') + 
+  annotate("rect", xmin = 12, xmax = 15, ymin = 0, ymax = Inf, alpha = .4) +
+  theme_minimal() +
+  labs(x = 'Temperature in ºC')
+```
+
+```{r}
+l <- 18 - 10
+h <- 1/(18-10)
+
+l2 <- 15 - 10
+l1 <- 12 - 10
+
+a2 <- h*l2
+a1 <- h*l1
+
+p <- a2-a1
+p
+```
+
+-   The probability that the mean annual temperature is between 12°C and 15°C is `r p*100`%.
+
+(b) What is the probability that the mean annual temperature is extreme in one year (below 10.5°C or above 17.8°C)?
+
+```{r}
+set.seed(2)
+x <- data.frame(x = runif(n = 99999, min = 10, max = 18)) 
+x |> 
+ggplot() + 
+  geom_histogram(aes(x = x), fill = 'gray', col = 'black', binwidth = .2, center = .1) +
+  geom_vline(xintercept = 10.5, color = 'red', linetype = 'dashed') + 
+  geom_vline(xintercept = 17.8, color = 'red', linetype = 'dashed') + 
+  annotate("rect", xmin = 10, xmax = 10.5, ymin = 0, ymax = Inf, alpha = .4) +
+  annotate("rect", xmin = 17.8, xmax = 18, ymin = 0, ymax = Inf, alpha = .4) +
+  theme_minimal()+
+  labs(x = 'Temperature in ºC')
+```
+
+```{r}
+l2 <- 18 - 17.8
+l1 <- 10.5 - 10
+
+a2 <- h*l2
+a1 <- h*l1
+
+p <- a2 + a1
+p
+```
+
+-   the probability that the mean annual temperature is extreme is `r p*100`%.
+
+2.  If commuting times are normally distributed with mean 30 minutes, and standard deviation 16 minutes, find the probability that a commute is shorter than 35 minutes. Use the table attached.
+
+```{r}
+set.seed(2)
+x <- data.frame(x = rnorm(n = 9999, mean = 30, sd = 16))
+
+x |> 
+  ggplot() +
+  geom_histogram(aes(x = x), binwidth = 1, center = .1) +
+  geom_vline(xintercept = 35, color = 'red', linetype = 'dashed') + 
+  annotate("rect", xmin = -Inf, xmax = 35, ymin = 0, ymax = Inf, alpha = .4) +
+  theme_minimal()+
+  labs(x = 'Commuting time in minutes')
+```
+
+```{r}
+x <- 35
+m <- 30
+s <- 16
+
+z <- (x - m)/s
+z
+p <- .3783
+1-p
+```
+
+-   The probability that a commute is shorter than 35 minutes is `r (1-p)*100`%.
+
+3.  Using the same commuting scenario, find the probability that a commute time is between 40 and 50 minutes. You may wish to sketch this example on a piece of paper before you start calculating!
+
+```{r}
+set.seed(2)
+x <- data.frame(x = rnorm(n = 9999, mean = 30, sd = 16))
+
+x |> 
+  ggplot() +
+  geom_histogram(aes(x = x), binwidth = 1, center = .1) +
+  geom_vline(xintercept = 40, color = 'red', linetype = 'dashed') +
+  geom_vline(xintercept = 50, color = 'red', linetype = 'dashed') + 
+  annotate("rect", xmin = 40, xmax = 50, ymin = 0, ymax = Inf, alpha = .4) +
+  theme_minimal()+
+  labs(x = 'Commuting time in minutes')
+```
+
+```{r}
+x2 <- 50
+x1 <- 40
+
+z2 <- (x2-m)/s
+z1 <- (x1-m)/s
+
+p2 <- .1056
+p1 <- .2676
+
+p <- p1-p2
+p
+```
+
+-   The probability that a commute is between 40 and 50 minutes is `r p*100` %.
+
+4.  We have time series of yearly precipitation sums for two locations, which are in close proximity. The average yearly precipitation at location 1 is 1100mm (measured over 105 years), the average yearly precipitation at location 2 is 1050mm (measured over 150 years). The data has a variance of σ1² = 125mm at location 1 (sample 1) and σ2² = 100mm at location 2 (sample 2). Samples are normally distributed. Variances of samples are assumed to be homogeneous thus the ordinary procedure (see slides) can be used to calculate t-test statistics.
+
+a)  In Excel use function =NORM.S.DIST(t,FALSE) to calculate empirical p-values (Note: Excel calculates one-sided p per default!). To evaluate a two-sided hypothesis, multiply by two.
+
+b)  Specify a significance level. Does the test produce significant results? Interpret the result in your own words.
+
+```{r, warning=FALSE, message=FALSE}
+m1 <- 1100
+n1 <- 105
+v1 <- 125
+
+m2 <- 1050
+n2 <- 150
+v2 <- 100
+
+set.seed(2)
+x1 <- data.frame(x = rnorm(n = n1, mean = m1, sd = sqrt(v1)))
+set.seed(2)
+x2 <- data.frame(x = rnorm(n = n2, mean = m2, sd = sqrt(v2)))
+
+ggplot() +
+  geom_histogram(data = x1, aes(x = x), fill = 'blue', col = 'blue', alpha = .2)+
+  geom_vline(xintercept = m1, color = 'blue', linetype = 'dashed') +
+  geom_histogram(data = x2, aes(x = x), fill = 'red', col = 'red', alpha = .2)+
+  geom_vline(xintercept = m2, color = 'red', linetype = 'dashed') +
+  theme_minimal()+
+  labs(x = 'Precipitation in mm')
+```
+
+```{r}
+sdd <- sqrt((v1/n1)+(v2/n2))
+D <- m1 - m2 
+(t <- D/sdd)
+(df <- n1 - 1 + n2 - 1)
+
+1- pnorm(t, mean = 0, sd = 1)
+
+t.test(x1, x2)
+```
+
+-   The p-value is \< 0.01 which means that the result is significant and the null hypothesis is rejected, meaning that there is a difference in the mean of precipitation in the two sampling locations. The lower a upper confidence interval (95%) of the difference is 45.6 and 50.9 mm respectively.
+
+5.  We wish to know whether the pattern observed in the figure below is consistent with the null hypothesis that the points were placed at random. Use the Quadrat Analysis Method to find out. There are six cells with three points, 20 cells with two points, 42 cells with one point, and 32 cells with no point.
+
+```{r}
+x <- c(2, 0, 1, 1, 0, 1, 1, 0, 0, 1, 
+       1, 3, 0, 2, 2, 1, 0, 2, 1, 0, 
+       1, 2, 0, 0, 1, 1, 2, 1, 1, 2,
+       0, 2, 1, 3, 0, 1, 1, 3, 0, 0, 
+       0, 0, 1, 1, 1, 1, 3, 1, 1, 2, 
+       1, 0, 2, 0, 1, 3, 0, 1, 0, 1, 
+       0, 2, 2, 0, 1, 1, 1, 2, 1, 0, 
+       3, 2, 1, 0, 1, 2, 2, 2, 0, 2, 
+       0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 
+       2, 0, 1, 2, 0, 1, 1, 1, 0, 1)
+
+m <- length(x)
+meanx <- mean(x)
+
+variance <- sum((x - meanx)^2) / (m-1)
+
+xsqr <- (m-1) * variance / meanx
+xsqr
+z = (xsqr- (m-1)) / sqrt(2 * (m-1))
+
+pnorm(z, mean = 0, sd = 1) * 2
+```
+
+-   The variance to mean ratio is `r variance / meanx` which means that the distribution is somewhat uniform. In addition, the null hypothesis is not rejected which means that the distribution is random.

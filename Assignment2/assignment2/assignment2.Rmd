@@ -1,0 +1,90 @@
+---
+title: "Assignment 2 - Exploratory Data Analysis"
+author: "Edgar Manrique"
+date: "3/29/2022"
+output: 
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(DT)
+```
+
+# Exploratory data analysis
+
+In this exercise we are going to use the `tidyverse` package together with the [FAO](https://www.fao.org/faostat/en/#data/QCL) dataset to to a little bit of Exploratory Data Analysis on food production.
+
+## Top 15 Ukranian agricultural production in 2020
+
+Using the data provided by FAO we can access the information related to agricultural production in Europe. To get only the production in Ukraine we can use functions from `tidyverse` to select and filter relevant columns and rows.
+
+```{r}
+fao <- read.csv('../data/Production_Crops_Livestock_E_Europe.csv') 
+(ukranine <- fao |> 
+    select(Area, Item, Y2020, Unit) |> 
+    filter(Unit == 'tonnes', Area == 'Ukraine') |> 
+    arrange(-Y2020) |> 
+    slice_head(n = 15) |> 
+    DT::datatable()
+)
+```
+
+As shown in the table above, Ukraine produces a large amount of cereals and potatoes, but how does this compare to the rest of Europe?
+
+## Potato production in Europe
+
+Similar to what we did before, now we are going to filter the FAO dataset, but, instead of filtering for the country *Ukraine*, we are going to filter by the item *Potatoes*.
+
+```{r}
+Potatoes <- fao |> 
+  select(Area, Item, Y2020, Unit) |> 
+  filter(Unit == 'tonnes', Item == 'Potatoes') |>  
+  drop_na(Y2020) |>  
+  arrange(-Y2020)
+
+datatable(Potatoes)
+```
+The table above shows the potato production in Europe in the year 2020. The first two countries (Ukraine and the Russian Federation) produced `r (Potatoes[1, 3] + Potatoes[2, 3])/1e6` million tonnes of potato on 2020, which is the `r ((Potatoes[1, 3] + Potatoes[2, 3])/sum(Potatoes[3:10, 3]))*100` percent of what the other top 10 countries produce together. 
+
+## Data visualization - Histogram and Boxplot
+
+The same information can be better explored by the use of visualizations. The histogram is really useful to quickly see the distribution of the data values.
+
+```{r}
+Potatoes |>  ggplot() +
+  geom_histogram(aes(x = Y2020/1e6), binwidth = .5) +
+  theme_minimal() + 
+  labs(x = 'Millions of tonnes')
+```
+
+As shown in the histogram above, you can  clearly and quickly see how there are two countries that are far away from the rest of the data, while the majority of them are clustered on low values. This means that many countries produce little amount of potatoes compared to just a few countries that produce a lot of potatoes.
+
+```{r}
+Potatoes |>  ggplot() +
+  geom_boxplot(aes(x = Y2020/1e6)) +
+  theme_minimal() + 
+  labs(x = 'Millions of tonnes')
+```
+
+Another quick visualization to represent the same information is the boxplot, here are also represented the 1st & 3rd quatiles, the median, the interquartile range and outliers.
+
+# Data interpretation
+
+We are going to use a QQ plot generated in this [publication](https://journals.plos.org/plosmedicine/article/file?id=10.1371/journal.pmed.1001367&type=printable) by Razak et al. 
+
+As explained in the paper: A QQ plot is constructed by plotting percentiles of BMI at the most recent survey cycle (yaxis) against percentile of BMI from the baseline survey cycle (xaxis). If the distribution of BMI remained exactly the same, percentiles of BMI would remain the same and the QQ plot would fall on the line y = x (the line of equality). Points that are higher than the line y = x represent higher levels of BMI at the same percentile in a subsequent survey year. If everyone in the population had a uniform change in their BMI, the QQ plot would show a set deviation from the line y = x, with the slope remaining the same. Alternatively, if between two surveys high BMI segments of the population had an increase in BMI and low BMI segments of the population had little to no increase in
+BMI, then the QQ plot would show minimal deviation from the line of equality at low percentiles but an increasing distance from the line of equality at upper percentiles. QQ plots are especially useful in detecting deviance at the tails of the distribution.
+
+![**Figure 2. QQ plots of BMI in 37 countries.**
+Country plots are ordered in terms of increasing mean weight between baseline and final survey, from smallest to largest. x-axis BMI at the baseline survey; y-axis BMI at final survey cycle. The diagonal line y = x is the line of equality between baseline survey and final survey. Δ BMI, change in mean BMI from first survey to last survey. Red text indicates decline in mean BMI; green text indicates increase in mean BMI. doi:10.1371/journal.pmed.1001367.g002. **2013 Razak et al.** ](../data/pmed.1001367.g002.png)
+
+Having a closer look at Peru on Figure 3 we can see how the QQ plot for different surveys present a different slope, and the slope increases on later surveys. People with higher BMI (Obesity) increased their BMI by a greater percentage than people with lower BMI. The distribution of BMI is overall moving towards the right, but people with BMI lower than 16 (Chronic energy deficiency) - and also below the 10th percentile - are remaining the same. 
+
+![**Figure 3.** 
+Population distribution of BMI over time in Bangladesh, Bolivia, Ghana, **Peru**, and Egypt. BMI histograms (panels on left). Vertical reference lines (dotted) represent established thresholds for BMI: 16.0 (chronic energy deficiency), 18.5 (underweight), 25.0 (overweight), and 30.0 (obese). Shaded regions represent proportion with BMI,16.0 or .25.0 in Bangladesh and proportion with BMI ,18.5 or .30.0 in Bolivia, Ghana, Peru, and Egypt. QQ plots (panels on right). x-axis BMI at the baseline survey. y-axis BMI at successive survey cycles. The diagonal line y = x is the line of equality between baseline survey and subsequent survey. Vertical reference lines (dotted) represent the 10th, 50th, and 90th percentile, with the value of BMI at the baseline survey at the top of each line. doi:10.1371/journal.pmed.1001367.g003. **2013 Razak et al.** ](../data/fig3.png)
+
